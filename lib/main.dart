@@ -1,3 +1,4 @@
+import 'package:backstreets_widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:showdown/src/screens/new_game.dart';
 
@@ -12,12 +13,14 @@ class MyApp extends StatelessWidget {
 
   // This widget is the root of your application.
   @override
-  Widget build(final BuildContext context) => MaterialApp(
-    title: 'Showdown',
-    theme: ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      useMaterial3: true,
+  Widget build(final BuildContext context) => EnsureSemantics(
+    child: MaterialApp(
+      title: 'Showdown',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const NewGame(),
     ),
-    home: const NewGame(),
   );
 }
