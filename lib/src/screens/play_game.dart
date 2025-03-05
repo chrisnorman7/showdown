@@ -72,6 +72,9 @@ class PlayGameState extends State<PlayGame> {
     TableEnd.right => TableEnd.left,
   };
 
+  /// Whether ens have been switched yet or not.
+  late bool endsSwitched;
+
   /// Initialise state.
   @override
   void initState() {
@@ -80,6 +83,7 @@ class PlayGameState extends State<PlayGame> {
     rightPlayer = ShowdownPlayer(name: widget.rightPlayerName, events: []);
     setNumber = 1;
     serveNumber = 1;
+    endsSwitched = false;
   }
 
   /// Build a widget.
@@ -439,6 +443,17 @@ class PlayGameState extends State<PlayGame> {
       }
     } else {
       serveNumber++;
+    }
+    if (widget.numberOfSets >= 5 &&
+        setNumber == 5 &&
+        widget.switchEnds &&
+        !endsSwitched &&
+        (getPoints(TableEnd.left) >= 6 || getPoints(TableEnd.right) >= 6)) {
+      endsSwitched = true;
+      final oldPlayer = rightPlayer;
+      rightPlayer = leftPlayer;
+      leftPlayer = oldPlayer;
+      context.showMessage(message: 'Switch ends.');
     }
     setState(() {});
   }
