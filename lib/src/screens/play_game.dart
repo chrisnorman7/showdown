@@ -49,13 +49,13 @@ class PlayGame extends StatefulWidget {
 /// State for [PlayGame].
 class PlayGameState extends State<PlayGame> {
   /// The left player for the game.
-  late final ShowdownPlayer leftPlayer;
+  late ShowdownPlayer leftPlayer;
 
   /// The right player.
-  late final ShowdownPlayer rightPlayer;
+  late ShowdownPlayer rightPlayer;
 
   /// The current set number.
-  late final int setNumber;
+  late int setNumber;
 
   /// The end of the table which will start the game.
   TableEnd? _startingEnd;
@@ -154,7 +154,7 @@ class PlayGameState extends State<PlayGame> {
                     final oldLeftPlayer = rightPlayer;
                     leftPlayer = rightPlayer;
                     rightPlayer = oldLeftPlayer;
-                    startSet(startingEnd);
+                    startSet();
                   },
                   tooltip: 'Next Set',
                   child: const Icon(Icons.arrow_forward),
@@ -377,13 +377,11 @@ class PlayGameState extends State<PlayGame> {
   }
 
   /// Set values for a new set.
-  void startSet(final TableEnd startingEnd) {
-    setState(() {
-      setNumber = 1;
-      servingEnd = startingEnd;
-      leftPlayer.events.clear();
-      rightPlayer.events.clear();
-    });
+  void startSet() {
+    servingEnd = _startingEnd!;
+    leftPlayer.events.clear();
+    rightPlayer.events.clear();
+    setState(() {});
   }
 
   /// Get the points for the given [end] of the table.
