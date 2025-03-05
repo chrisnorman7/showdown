@@ -125,40 +125,42 @@ class PlayGameState extends State<PlayGame> {
         TableEnd.left => leftPlayer,
         TableEnd.right => rightPlayer,
       };
-      return SimpleScaffold(
-        title: 'Game Over',
-        body: ListView(
-          shrinkWrap: true,
-          children: [
-            ListTile(
-              autofocus: true,
-              title: Text('Winner of set $setNumber'),
-              subtitle: Text(winningPlayer.name),
-              onTap: () {},
-            ),
-            ListTile(
-              title: const Text('Scores'),
-              subtitle: Text(
-                '${getPoints(winningEnd)} / ${getPoints(losingEnd)}',
+      return Cancel(
+        child: SimpleScaffold(
+          title: 'Game Over',
+          body: ListView(
+            shrinkWrap: true,
+            children: [
+              ListTile(
+                autofocus: true,
+                title: Text('Winner of set $setNumber'),
+                subtitle: Text(winningPlayer.name),
+                onTap: () {},
               ),
-              onTap: () {},
-            ),
-          ],
-        ),
-        floatingActionButton:
-            setNumber >= widget.numberOfSets
-                ? null
-                : FloatingActionButton(
-                  onPressed: () {
-                    setNumber++;
-                    final oldLeftPlayer = rightPlayer;
-                    leftPlayer = rightPlayer;
-                    rightPlayer = oldLeftPlayer;
-                    startSet();
-                  },
-                  tooltip: 'Next Set',
-                  child: const Icon(Icons.arrow_forward),
+              ListTile(
+                title: const Text('Scores'),
+                subtitle: Text(
+                  '${getPoints(winningEnd)} / ${getPoints(losingEnd)}',
                 ),
+                onTap: () {},
+              ),
+            ],
+          ),
+          floatingActionButton:
+              setNumber >= widget.numberOfSets
+                  ? null
+                  : FloatingActionButton(
+                    onPressed: () {
+                      setNumber++;
+                      final oldLeftPlayer = rightPlayer;
+                      leftPlayer = rightPlayer;
+                      rightPlayer = oldLeftPlayer;
+                      startSet();
+                    },
+                    tooltip: 'Next Set',
+                    child: const Icon(Icons.arrow_forward),
+                  ),
+        ),
       );
     }
     final servingPlayer = switch (servingEnd) {
@@ -312,6 +314,11 @@ class PlayGameState extends State<PlayGame> {
               '${rightPlayer.name}: ${getPoints(TableEnd.right)}',
             ),
       ),
+      GameShortcut(
+        title: 'End the game',
+        shortcut: GameShortcutsShortcut.escape,
+        onStart: (final innerContext) => innerContext.pop(),
+      ),
     ];
     shortcuts.add(
       GameShortcut(
@@ -390,19 +397,15 @@ class PlayGameState extends State<PlayGame> {
 
   /// Get the points for the given [end] of the table.
   int getPoints(final TableEnd end) {
-    final List<ShowdownEvent> ownedEvents;
-    final List<ShowdownEvent> opponentEvents;
+    final Iterable<ShowdownEvent> ownedEvents;
+    final Iterable<ShowdownEvent> opponentEvents;
     switch (end) {
       case TableEnd.left:
-        ownedEvents = leftPlayer.events;
-        opponentEvents =
-            rightPlayer.events
-                .where((final event) => event.points < 0)
-                .toList();
+        ownedEvents = leftPlayer.events.where((final e) => e.points > 0);
+        opponentEvents = rightPlayer.events.where((final e) => e.points < 0);
       case TableEnd.right:
-        ownedEvents = rightPlayer.events;
-        opponentEvents =
-            leftPlayer.events.where((final event) => event.points < 0).toList();
+        ownedEvents = rightPlayer.events.where((final e) => e.points > 0);
+        opponentEvents = leftPlayer.events.where((final e) => e.points < 0);
     }
     final events = [...ownedEvents, ...opponentEvents];
     if (events.isEmpty) {
