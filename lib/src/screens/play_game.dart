@@ -348,15 +348,19 @@ class PlayGameState extends State<PlayGame> {
               child: ListView(
                 shrinkWrap: true,
                 children: [
-                  ListTile(
-                    autofocus: true,
-                    title: Text(
-                      "${servingPlayer.name}'s ${serveNumber.ordinal()} serve",
+                  Semantics(
+                    liveRegion: true,
+                    child: ListTile(
+                      autofocus: true,
+                      title: Text(
+                        // ignore: lines_longer_than_80_chars
+                        "${servingPlayer.name}'s ${serveNumber.ordinal()} serve",
+                      ),
+                      subtitle: Text(
+                        '${getPoints(servingEnd)} / ${getPoints(receivingEnd)}',
+                      ),
+                      onTap: () {},
                     ),
-                    subtitle: Text(
-                      '${getPoints(servingEnd)} / ${getPoints(receivingEnd)}',
-                    ),
-                    onTap: () {},
                   ),
                 ],
               ),
