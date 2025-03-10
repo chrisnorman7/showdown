@@ -1,7 +1,11 @@
 /// An event in a showdown game.
-class ShowdownEvent {
+class ShowdownEvent implements Comparable<ShowdownEvent> {
   /// Create an instance.
-  ShowdownEvent({required this.points, required this.description});
+  ShowdownEvent({required this.points, required this.description})
+    : created = DateTime.now();
+
+  /// The time when this event was created.
+  final DateTime created;
 
   /// The number of points this event awards.
   ///
@@ -11,4 +15,8 @@ class ShowdownEvent {
 
   /// The description of this event.
   String description;
+
+  /// Compare to [other].
+  @override
+  int compareTo(final ShowdownEvent other) => created.compareTo(other.created);
 }

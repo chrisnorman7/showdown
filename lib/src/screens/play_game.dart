@@ -106,21 +106,24 @@ class PlayGameState extends State<PlayGame> {
         const Duration(seconds: 1),
         () => setState(() => secondsRemaining -= 1),
       );
-      return SimpleScaffold(
-        title: 'Timer',
-        body: ListView(
-          shrinkWrap: true,
-          children: [
-            ListTile(
-              autofocus: true,
-              title: const Text('Remaining seconds'),
-              subtitle: Semantics(
-                liveRegion: true,
-                child: Text('$secondsRemaining'),
+      return DefaultTextStyle(
+        style: const TextStyle(fontSize: 32),
+        child: SimpleScaffold(
+          title: 'Timer',
+          body: ListView(
+            shrinkWrap: true,
+            children: [
+              ListTile(
+                autofocus: true,
+                title: const Text('Remaining seconds'),
+                subtitle: Semantics(
+                  liveRegion: true,
+                  child: Text('$secondsRemaining'),
+                ),
+                onTap: () {},
               ),
-              onTap: () {},
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
@@ -367,56 +370,132 @@ class PlayGameState extends State<PlayGame> {
             ),
       ),
     );
-    return Actions(
-      actions: {UndoTextIntent: CallbackAction(onInvoke: (_) => undoAction())},
-      child: GameShortcuts(
-        shortcuts: shortcuts,
-        autofocus: false,
-        canRequestFocus: false,
-        child: SimpleScaffold(
-          title: 'Set $setNumber / ${widget.numberOfSets}',
-          body: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+    final bottomRow = Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          flex: 3,
+          child: PlayerColumn(
+            player: leftPlayer,
+            tableEnd: TableEnd.left,
+            performAction: performAction,
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Column(
             children: [
-              Expanded(
-                flex: 3,
-                child: PlayerColumn(
-                  player: leftPlayer,
-                  tableEnd: TableEnd.left,
-                  performAction: performAction,
+              IconButton(
+                onPressed: () => setState(() => secondsRemaining = 60),
+                icon: const Icon(
+                  Icons.timer,
+                  semanticLabel: 'Start 60-second count down',
                 ),
               ),
-              Expanded(
-                flex: 2,
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    Semantics(
-                      liveRegion: true,
-                      child: ListTile(
-                        autofocus: true,
-                        title: Text(
-                          // ignore: lines_longer_than_80_chars
-                          "${servingPlayer.name}'s ${serveNumber.ordinal()} serve",
-                        ),
-                        subtitle: Text(
-                          '${getPoints(servingEnd)} / ${getPoints(receivingEnd)}',
-                        ),
-                        onTap: () {},
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 3,
-                child: PlayerColumn(
-                  player: rightPlayer,
-                  tableEnd: TableEnd.right,
-                  performAction: performAction,
+              Semantics(
+                liveRegion: true,
+                child: Focus(
+                  autofocus: true,
+                  child: Text(
+                    "${servingPlayer.name}'s ${serveNumber.ordinal()} serve: ${getPoints(servingEnd)} / ${getPoints(receivingEnd)}",
+                  ),
                 ),
               ),
             ],
+          ),
+        ),
+        Expanded(
+          flex: 3,
+          child: PlayerColumn(
+            player: rightPlayer,
+            tableEnd: TableEnd.right,
+            performAction: performAction,
+          ),
+        ),
+      ],
+    );
+    return DefaultTextStyle(
+      style: const TextStyle(fontSize: 24),
+      child: Actions(
+        actions: {
+          UndoTextIntent: CallbackAction(onInvoke: (_) => undoAction()),
+        },
+        child: GameShortcuts(
+          shortcuts: shortcuts,
+          autofocus: false,
+          canRequestFocus: false,
+          child: SimpleScaffold(
+            title: 'Set $setNumber / ${widget.numberOfSets}',
+            body: OrientationBuilder(
+              builder: (final context, final orientation) {
+                switch (orientation) {
+                  case Orientation.portrait:
+                    final events = [...leftPlayer.events, ...rightPlayer.events]
+                      ..sort();
+                    return Column(
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                            itemBuilder: (final context, final index) {
+                              final event = events[index];
+                              return ShowdownEventListTile(
+                                event: event,
+                                player:
+                                    leftPlayer.events.contains(event)
+                                        ? leftPlayer
+                                        : rightPlayer,
+                              );
+                            },
+                            itemCount: events.length,
+                            shrinkWrap: true,
+                          ),
+                        ),
+                        const Divider(height: 12.0),
+                        bottomRow,
+                      ],
+                    );
+                  case Orientation.landscape:
+                    return Column(
+                      children: [
+                        Expanded(
+                          flex: 7,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 5,
+                                child: ListView.builder(
+                                  itemBuilder:
+                                      (final context, final index) =>
+                                          ShowdownEventListTile(
+                                            event: leftPlayer.events[index],
+                                          ),
+                                  itemCount: leftPlayer.events.length,
+                                  shrinkWrap: true,
+                                ),
+                              ),
+                              const VerticalDivider(),
+                              Expanded(
+                                flex: 5,
+                                child: ListView.builder(
+                                  itemBuilder:
+                                      (final context, final index) =>
+                                          ShowdownEventListTile(
+                                            event: rightPlayer.events[index],
+                                          ),
+                                  itemCount: rightPlayer.events.length,
+                                  shrinkWrap: true,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Divider(height: 12.0),
+                        Expanded(flex: 3, child: bottomRow),
+                      ],
+                    );
+                }
+              },
+            ),
           ),
         ),
       ),
