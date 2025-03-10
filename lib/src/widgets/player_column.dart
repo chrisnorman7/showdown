@@ -65,48 +65,54 @@ class PlayerColumn extends StatelessWidget {
     return Column(
       crossAxisAlignment: crossAxisAlignment,
       children: [
-        Row(
-          crossAxisAlignment: crossAxisAlignment,
-          children: switch (tableEnd) {
-            TableEnd.left => [foulButton, warningButton],
-            TableEnd.right => [warningButton, foulButton],
-          },
+        Expanded(
+          child: Row(
+            crossAxisAlignment: crossAxisAlignment,
+            children: switch (tableEnd) {
+              TableEnd.left => [foulButton, warningButton],
+              TableEnd.right => [warningButton, foulButton],
+            },
+          ),
         ),
-        CheckboxListTile(
-          value: player.timeout,
-          onChanged: (final value) {
-            if (player.timeout) {
-              final event = ShowdownEvent(
-                points: -2,
-                description: 'Timeout already requested',
-              );
+        Expanded(
+          child: CheckboxListTile(
+            value: player.timeout,
+            onChanged: (final value) {
+              if (player.timeout) {
+                final event = ShowdownEvent(
+                  points: -2,
+                  description: 'Timeout already requested',
+                );
+                performAction(
+                  UndoableAction(
+                    action: () => player.events.add(event),
+                    undo: () => player.events.remove(event),
+                  ),
+                );
+              } else {
+                performAction(
+                  UndoableAction(
+                    action: () => player.timeout = true,
+                    undo: () => player.timeout = false,
+                    endPoint: false,
+                  ),
+                );
+              }
+            },
+            title: const Text('Timeout'),
+          ),
+        ),
+        Expanded(
+          child: GoalButton(
+            addEvent: (final event) {
               performAction(
                 UndoableAction(
                   action: () => player.events.add(event),
                   undo: () => player.events.remove(event),
                 ),
               );
-            } else {
-              performAction(
-                UndoableAction(
-                  action: () => player.timeout = true,
-                  undo: () => player.timeout = false,
-                  endPoint: false,
-                ),
-              );
-            }
-          },
-          title: const Text('Timeout'),
-        ),
-        GoalButton(
-          addEvent: (final event) {
-            performAction(
-              UndoableAction(
-                action: () => player.events.add(event),
-                undo: () => player.events.remove(event),
-              ),
-            );
-          },
+            },
+          ),
         ),
       ],
     );

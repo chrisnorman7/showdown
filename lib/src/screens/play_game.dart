@@ -434,7 +434,8 @@ class PlayGameState extends State<PlayGame> {
                       ..sort();
                     return Column(
                       children: [
-                        Expanded(
+                        Flexible(
+                          flex: 8,
                           child: ListView.builder(
                             itemBuilder: (final context, final index) {
                               final event = events[index];
@@ -451,7 +452,7 @@ class PlayGameState extends State<PlayGame> {
                           ),
                         ),
                         const Divider(height: 12.0),
-                        bottomRow,
+                        Expanded(flex: 2, child: bottomRow),
                       ],
                     );
                   case Orientation.landscape:
