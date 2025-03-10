@@ -444,11 +444,14 @@ class PlayGameState extends State<PlayGame> {
     } else {
       serveNumber++;
     }
-    if (widget.numberOfSets >= 5 &&
-        setNumber == 5 &&
+    final halfWay =
+        (widget.winningPoints / 2).floor() + (widget.winningPoints % 2);
+    if (widget.numberOfSets > 1 &&
+        setNumber == widget.numberOfSets &&
         widget.switchEnds &&
         !endsSwitched &&
-        (getPoints(TableEnd.left) >= 6 || getPoints(TableEnd.right) >= 6)) {
+        (getPoints(TableEnd.left) >= halfWay ||
+            getPoints(TableEnd.right) >= halfWay)) {
       endsSwitched = true;
       final oldPlayer = rightPlayer;
       rightPlayer = leftPlayer;
