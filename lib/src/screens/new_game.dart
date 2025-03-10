@@ -29,11 +29,11 @@ class NewGame extends StatefulWidget {
 
 /// State for [NewGame].
 class NewGameState extends State<NewGame> {
-  /// The name of the left player.
-  late String leftPlayerName;
+  /// The controller for the name of the left player.
+  late final TextEditingController _leftNameController;
 
-  /// The name of the right player.
-  late String rightPlayerName;
+  /// The controller for the name of the right player.
+  late final TextEditingController _rightNameController;
 
   /// The minimum points for winning the game.
   late int winningPoints;
@@ -54,13 +54,29 @@ class NewGameState extends State<NewGame> {
   @override
   void initState() {
     super.initState();
-    leftPlayerName = 'Left Player';
-    rightPlayerName = 'Right Player';
+    _leftNameController = TextEditingController(text: 'Player 1');
+    _leftNameController.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: _leftNameController.text.length,
+    );
+    _rightNameController = TextEditingController(text: 'Player 2');
+    _rightNameController.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: _rightNameController.text.length,
+    );
     winningPoints = 11;
     clearPoints = 2;
     numberOfSets = 1;
     switchEnds = true;
     numberOfServes = 2;
+  }
+
+  /// Dispose of the widget.
+  @override
+  void dispose() {
+    super.dispose();
+    _leftNameController.dispose();
+    _rightNameController.dispose();
   }
 
   /// Build a widget.
@@ -75,24 +91,22 @@ class NewGameState extends State<NewGame> {
       body: ListView(
         shrinkWrap: true,
         children: [
-          TextListTile(
-            value: leftPlayerName,
-            onChanged: (final value) => setState(() => leftPlayerName = value),
-            header: 'Left Player Name',
+          TextFormField(
             autofocus: true,
+            controller: _leftNameController,
+            decoration: const InputDecoration(labelText: 'Left player name'),
           ),
-          TextListTile(
-            value: rightPlayerName,
-            onChanged: (final value) => setState(() => rightPlayerName = value),
-            header: 'Right Player Name',
+          TextFormField(
+            controller: _rightNameController,
+            decoration: const InputDecoration(labelText: 'Right player name'),
           ),
           ListTile(
             title: const Text('Switch Ends'),
             onTap:
                 () => setState(() {
-                  final temp = leftPlayerName;
-                  leftPlayerName = rightPlayerName;
-                  rightPlayerName = temp;
+                  final temp = _leftNameController.text;
+                  _leftNameController.text = _rightNameController.text;
+                  _rightNameController.text = temp;
                 }),
           ),
           PerformableActionsBuilder(
@@ -154,8 +168,8 @@ class NewGameState extends State<NewGame> {
   /// Start the game with the current settings.
   void playGame(final BuildContext context) => context.pushWidgetBuilder(
     (_) => PlayGame(
-      leftPlayerName: leftPlayerName,
-      rightPlayerName: rightPlayerName,
+      leftPlayerName: _leftNameController.text,
+      rightPlayerName: _rightNameController.text,
       winningPoints: winningPoints,
       clearPoints: clearPoints,
       switchEnds: switchEnds,
