@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:recase/recase.dart';
 import 'package:showdown/showdown.dart';
 
+/// The type of a perform action function.
+typedef PerformAction = void Function(UndoableAction action);
+
 /// A screen for playing a game.
 class PlayGame extends StatefulWidget {
   /// Create an instance.
@@ -48,6 +51,9 @@ class PlayGame extends StatefulWidget {
 
 /// State for [PlayGame].
 class PlayGameState extends State<PlayGame> {
+  /// An action which can be undone.
+  UndoableAction? _action;
+
   /// The left player for the game.
   late ShowdownPlayer leftPlayer;
 
@@ -323,6 +329,13 @@ class PlayGameState extends State<PlayGame> {
         shortcut: GameShortcutsShortcut.escape,
         onStart: (final innerContext) => innerContext.pop(),
       ),
+      GameShortcut(
+        title: 'Undo the most recent action.',
+        shortcut: GameShortcutsShortcut.keyZ,
+        controlKey: useControlKey,
+        metaKey: useMetaKey,
+        onStart: (_) => undoAction(),
+      ),
     ];
     shortcuts.add(
       GameShortcut(
@@ -336,63 +349,86 @@ class PlayGameState extends State<PlayGame> {
             ),
       ),
     );
-    return GameShortcuts(
-      shortcuts: shortcuts,
-      autofocus: false,
-      canRequestFocus: false,
-      child: SimpleScaffold(
-        title: 'Set $setNumber / ${widget.numberOfSets}',
-        body: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              flex: 3,
-              child: PlayerColumn(
-                player: leftPlayer,
-                tableEnd: TableEnd.left,
-                updateEvents: endPoint,
-                letEvent: () => setState(() {}),
+    return Actions(
+      actions: {UndoTextIntent: CallbackAction(onInvoke: (_) => undoAction())},
+      child: GameShortcuts(
+        shortcuts: shortcuts,
+        autofocus: false,
+        canRequestFocus: false,
+        child: SimpleScaffold(
+          title: 'Set $setNumber / ${widget.numberOfSets}',
+          body: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                flex: 3,
+                child: PlayerColumn(
+                  player: leftPlayer,
+                  tableEnd: TableEnd.left,
+                  performAction: performAction,
+                ),
               ),
-            ),
-            Expanded(
-              flex: 2,
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  Semantics(
-                    liveRegion: true,
-                    child: ListTile(
-                      autofocus: true,
-                      title: Text(
-                        // ignore: lines_longer_than_80_chars
-                        "${servingPlayer.name}'s ${serveNumber.ordinal()} serve",
+              Expanded(
+                flex: 2,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    Semantics(
+                      liveRegion: true,
+                      child: ListTile(
+                        autofocus: true,
+                        title: Text(
+                          // ignore: lines_longer_than_80_chars
+                          "${servingPlayer.name}'s ${serveNumber.ordinal()} serve",
+                        ),
+                        subtitle: Text(
+                          '${getPoints(servingEnd)} / ${getPoints(receivingEnd)}',
+                        ),
+                        onTap: () {},
                       ),
-                      subtitle: Text(
-                        '${getPoints(servingEnd)} / ${getPoints(receivingEnd)}',
-                      ),
-                      onTap: () {},
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              flex: 3,
-              child: PlayerColumn(
-                player: rightPlayer,
-                tableEnd: TableEnd.right,
-                updateEvents: endPoint,
-                letEvent: () => setState(() {}),
+              Expanded(
+                flex: 3,
+                child: PlayerColumn(
+                  player: rightPlayer,
+                  tableEnd: TableEnd.right,
+                  performAction: performAction,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
+  /// Undo the most recent action.
+  void undoAction() {
+    final action = _action;
+    if (action != null) {
+      action.undo();
+      _action = null;
+      context.announce('Undone last action.');
+      if (action.endPoint) {
+        if (serveNumber == 1) {
+          servingEnd = receivingEnd;
+          serveNumber = widget.numberOfServes;
+        } else {
+          serveNumber -= 1;
+        }
+      }
+      setState(() {});
+    } else {
+      context.announce('Nothing to undo.');
+    }
+  }
+
   /// Set values for a new set.
   void startSet() {
+    _action = null;
     servingEnd = _startingEnd!;
     leftPlayer.events.clear();
     rightPlayer.events.clear();
@@ -459,5 +495,16 @@ class PlayGameState extends State<PlayGame> {
       context.showMessage(message: 'Switch ends.');
     }
     setState(() {});
+  }
+
+  /// Perform [action].
+  void performAction(final UndoableAction action) {
+    action.action();
+    _action = action;
+    if (action.endPoint) {
+      endPoint();
+    } else {
+      setState(() {});
+    }
   }
 }
