@@ -107,7 +107,7 @@ class PlayGameState extends State<PlayGame> {
         () => setState(() => secondsRemaining -= 1),
       );
       return DefaultTextStyle(
-        style: const TextStyle(fontSize: 32),
+        style: const TextStyle(fontSize: 24),
         child: SimpleScaffold(
           title: 'Timer',
           body: ListView(
@@ -415,7 +415,7 @@ class PlayGameState extends State<PlayGame> {
       ],
     );
     return DefaultTextStyle(
-      style: const TextStyle(fontSize: 24),
+      style: const TextStyle(fontSize: 16),
       child: Actions(
         actions: {
           UndoTextIntent: CallbackAction(onInvoke: (_) => undoAction()),
