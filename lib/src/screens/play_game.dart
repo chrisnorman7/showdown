@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:backstreets_widgets/shortcuts.dart';
@@ -81,6 +83,9 @@ class PlayGameState extends State<PlayGame> {
   /// Whether ens have been switched yet or not.
   late bool endsSwitched;
 
+  /// The number of seconds left on the timer.
+  late int secondsRemaining;
+
   /// Initialise state.
   @override
   void initState() {
@@ -90,11 +95,35 @@ class PlayGameState extends State<PlayGame> {
     setNumber = 1;
     serveNumber = 1;
     endsSwitched = false;
+    secondsRemaining = 0;
   }
 
   /// Build a widget.
   @override
   Widget build(final BuildContext context) {
+    if (secondsRemaining > 0) {
+      Timer(
+        const Duration(seconds: 1),
+        () => setState(() => secondsRemaining -= 1),
+      );
+      return SimpleScaffold(
+        title: 'Timer',
+        body: ListView(
+          shrinkWrap: true,
+          children: [
+            ListTile(
+              autofocus: true,
+              title: const Text('Remaining seconds'),
+              subtitle: Semantics(
+                liveRegion: true,
+                child: Text('$secondsRemaining'),
+              ),
+              onTap: () {},
+            ),
+          ],
+        ),
+      );
+    }
     final startingEnd = _startingEnd;
     if (startingEnd == null) {
       return SimpleScaffold(
@@ -305,6 +334,15 @@ class PlayGameState extends State<PlayGame> {
             (final innerContext) => innerContext.announce(
               '${rightPlayer.name}: ${getPoints(TableEnd.right)}',
             ),
+      ),
+      GameShortcut(
+        title: 'Sixty seconds timer',
+        shortcut: GameShortcutsShortcut.digit9,
+        onStart: (final innerContext) {
+          setState(() {
+            secondsRemaining = 60;
+          });
+        },
       ),
       GameShortcut(
         title: 'Undo the most recent action.',
