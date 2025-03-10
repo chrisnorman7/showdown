@@ -181,70 +181,62 @@ class PlayGameState extends State<PlayGame> {
       GameShortcut(
         title: 'Left player foul',
         shortcut: GameShortcutsShortcut.digit1,
-        controlKey: useControlKey,
-        metaKey: useMetaKey,
         onStart: (final innerContext) {
-          leftPlayer.events.add(ShowdownEvent(points: -1, description: 'Foul'));
-          innerContext.announce('${leftPlayer.name} foul.');
-          endPoint();
+          addEvent(leftPlayer, ShowdownEvent(points: -1, description: 'Foul'));
         },
       ),
       GameShortcut(
         title: 'Left player goal',
-        shortcut: GameShortcutsShortcut.digit2,
-        controlKey: useControlKey,
-        metaKey: useMetaKey,
+        shortcut: GameShortcutsShortcut.digit7,
         onStart: (final innerContext) {
-          leftPlayer.events.add(ShowdownEvent(points: 2, description: 'Goal'));
-          innerContext.announce('${leftPlayer.name} goal.');
-          endPoint();
+          addEvent(leftPlayer, ShowdownEvent(points: 2, description: 'Goal'));
         },
       ),
       GameShortcut(
         title: 'Left player warning',
-        shortcut: GameShortcutsShortcut.digit3,
-        controlKey: useControlKey,
-        metaKey: useMetaKey,
+        shortcut: GameShortcutsShortcut.digit2,
         onStart: (final innerContext) {
           if (leftPlayer.firstWarning) {
-            leftPlayer.events.add(
+            addEvent(
+              leftPlayer,
               ShowdownEvent(points: -2, description: 'Foul after warning'),
             );
-            innerContext.announce('Second warning for ${leftPlayer.name}.');
-            endPoint();
           } else {
-            leftPlayer.firstWarning = true;
+            performAction(
+              UndoableAction(
+                action: () => leftPlayer.firstWarning = true,
+                undo: () => leftPlayer.firstWarning = false,
+                endPoint: false,
+              ),
+            );
             innerContext.announce('First warning for ${leftPlayer.name}.');
-            setState(() {});
           }
         },
       ),
       GameShortcut(
         title: 'Left player timeout',
-        shortcut: GameShortcutsShortcut.digit4,
-        controlKey: useControlKey,
-        metaKey: useMetaKey,
+        shortcut: GameShortcutsShortcut.digit8,
         onStart: (final innerContext) {
           if (leftPlayer.timeout) {
-            leftPlayer.events.add(
+            addEvent(
+              leftPlayer,
               ShowdownEvent(points: -2, description: 'Timeout already called'),
             );
-            innerContext.announce(
-              'Timeout already called for ${leftPlayer.name}.',
-            );
-            endPoint();
           } else {
-            leftPlayer.timeout = true;
+            performAction(
+              UndoableAction(
+                action: () => leftPlayer.timeout = true,
+                undo: () => leftPlayer.timeout = false,
+                endPoint: false,
+              ),
+            );
             innerContext.announce('Timeout called for ${leftPlayer.name}.');
-            setState(() {});
           }
         },
       ),
       GameShortcut(
         title: 'Announce left player points',
-        shortcut: GameShortcutsShortcut.digit5,
-        controlKey: useControlKey,
-        metaKey: useMetaKey,
+        shortcut: GameShortcutsShortcut.digit3,
         onStart:
             (final innerContext) => innerContext.announce(
               '${leftPlayer.name}: ${getPoints(TableEnd.left)}',
@@ -252,89 +244,77 @@ class PlayGameState extends State<PlayGame> {
       ),
       GameShortcut(
         title: 'Right player foul',
-        shortcut: GameShortcutsShortcut.digit0,
-        controlKey: useControlKey,
-        metaKey: useMetaKey,
+        shortcut: GameShortcutsShortcut.digit6,
         onStart: (final innerContext) {
-          rightPlayer.events.add(
-            ShowdownEvent(points: -1, description: 'Foul'),
-          );
-          innerContext.announce('${rightPlayer.name} foul.');
-          endPoint();
+          addEvent(rightPlayer, ShowdownEvent(points: -1, description: 'Foul'));
         },
       ),
       GameShortcut(
         title: 'Right player goal',
-        shortcut: GameShortcutsShortcut.digit9,
-        controlKey: useControlKey,
-        metaKey: useMetaKey,
+        shortcut: GameShortcutsShortcut.keyB,
         onStart: (final innerContext) {
-          rightPlayer.events.add(ShowdownEvent(points: 2, description: 'Goal'));
-          innerContext.announce('${rightPlayer.name} goal.');
-          endPoint();
+          addEvent(rightPlayer, ShowdownEvent(points: 2, description: 'Goal'));
         },
       ),
       GameShortcut(
         title: 'Right player warning',
-        shortcut: GameShortcutsShortcut.digit8,
-        controlKey: useControlKey,
-        metaKey: useMetaKey,
+        shortcut: GameShortcutsShortcut.digit5,
         onStart: (final innerContext) {
           if (rightPlayer.firstWarning) {
-            rightPlayer.events.add(
+            addEvent(
+              rightPlayer,
               ShowdownEvent(points: -2, description: 'Foul after warning'),
             );
-            innerContext.announce('Second warning for ${rightPlayer.name}.');
-            endPoint();
           } else {
-            rightPlayer.firstWarning = true;
+            performAction(
+              UndoableAction(
+                action: () => rightPlayer.firstWarning = true,
+                undo: () => rightPlayer.firstWarning = false,
+                endPoint: false,
+              ),
+            );
             innerContext.announce('First warning for ${rightPlayer.name}.');
-            setState(() {});
           }
         },
       ),
       GameShortcut(
         title: 'Right player timeout',
-        shortcut: GameShortcutsShortcut.digit7,
-        controlKey: useControlKey,
-        metaKey: useMetaKey,
+        shortcut: GameShortcutsShortcut.keyA,
         onStart: (final innerContext) {
           if (rightPlayer.timeout) {
-            rightPlayer.events.add(
+            addEvent(
+              rightPlayer,
               ShowdownEvent(points: -2, description: 'Timeout already called'),
             );
-            innerContext.announce(
-              'Timeout already called for ${rightPlayer.name}.',
-            );
-            endPoint();
           } else {
-            rightPlayer.timeout = true;
+            performAction(
+              UndoableAction(
+                action: () => rightPlayer.timeout = true,
+                undo: () => rightPlayer.timeout = false,
+                endPoint: false,
+              ),
+            );
             innerContext.announce('Timeout called for ${rightPlayer.name}.');
-            setState(() {});
           }
         },
       ),
       GameShortcut(
         title: 'Announce right player points',
-        shortcut: GameShortcutsShortcut.digit6,
-        controlKey: useControlKey,
-        metaKey: useMetaKey,
+        shortcut: GameShortcutsShortcut.digit4,
         onStart:
             (final innerContext) => innerContext.announce(
               '${rightPlayer.name}: ${getPoints(TableEnd.right)}',
             ),
       ),
       GameShortcut(
+        title: 'Undo the most recent action.',
+        shortcut: GameShortcutsShortcut.digit0,
+        onStart: (_) => undoAction(),
+      ),
+      GameShortcut(
         title: 'End the game',
         shortcut: GameShortcutsShortcut.escape,
         onStart: (final innerContext) => innerContext.pop(),
-      ),
-      GameShortcut(
-        title: 'Undo the most recent action.',
-        shortcut: GameShortcutsShortcut.keyZ,
-        controlKey: useControlKey,
-        metaKey: useMetaKey,
-        onStart: (_) => undoAction(),
       ),
     ];
     shortcuts.add(
@@ -495,6 +475,17 @@ class PlayGameState extends State<PlayGame> {
       context.showMessage(message: 'Switch ends.');
     }
     setState(() {});
+  }
+
+  /// Add [event] as an undoable action.
+  void addEvent(final ShowdownPlayer player, final ShowdownEvent event) {
+    context.announce('${player.name} ${event.description}');
+    performAction(
+      UndoableAction(
+        action: () => player.events.add(event),
+        undo: () => player.events.remove(event),
+      ),
+    );
   }
 
   /// Perform [action].
