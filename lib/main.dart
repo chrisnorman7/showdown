@@ -1,5 +1,6 @@
-import 'package:backstreets_widgets/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:showdown/src/screens/new_game.dart';
 
 void main() {
@@ -13,14 +14,17 @@ class MyApp extends StatelessWidget {
 
   // This widget is the root of your application.
   @override
-  Widget build(final BuildContext context) => EnsureSemantics(
-    child: MaterialApp(
+  Widget build(final BuildContext context) {
+    if (kIsWeb) {
+      RendererBinding.instance.ensureSemantics();
+    }
+    return MaterialApp(
       title: 'Showdown',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: const NewGame(),
-    ),
-  );
+    );
+  }
 }

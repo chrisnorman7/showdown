@@ -14,5 +14,6 @@ class GoalButton extends StatelessWidget {
   Widget build(final BuildContext context) => IconButton(
     onPressed: () => addEvent(ShowdownEvent(points: 2, description: 'Goal')),
     icon: const Icon(Icons.sports_soccer, semanticLabel: 'Add goal'),
+    tooltip: 'Add goal',
   );
 }

@@ -391,15 +391,24 @@ class PlayGameState extends State<PlayGame> {
                   Icons.timer,
                   semanticLabel: 'Start 60-second count down',
                 ),
+                tooltip: 'Count down from 1 minute',
               ),
               Semantics(
                 liveRegion: true,
                 child: Focus(
                   autofocus: true,
+                  canRequestFocus: true,
+                  descendantsAreFocusable: true,
+                  descendantsAreTraversable: true,
                   child: Text(
                     "${servingPlayer.name}'s ${serveNumber.ordinal()} serve: ${getPoints(servingEnd)} / ${getPoints(receivingEnd)}",
                   ),
                 ),
+              ),
+              IconButton(
+                onPressed: undoAction,
+                icon: const Icon(Icons.undo, semanticLabel: 'Undo'),
+                tooltip: 'Undo previous action',
               ),
             ],
           ),

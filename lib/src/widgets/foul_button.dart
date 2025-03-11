@@ -14,5 +14,6 @@ class FoulButton extends StatelessWidget {
   Widget build(final BuildContext context) => IconButton(
     onPressed: () => addEvent(ShowdownEvent(points: -1, description: 'Foul')),
     icon: const Icon(Icons.sports_kabaddi, semanticLabel: 'Add foul'),
+    tooltip: 'Add foul',
   );
 }
