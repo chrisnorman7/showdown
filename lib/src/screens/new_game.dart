@@ -36,19 +36,19 @@ class NewGameState extends State<NewGame> {
   late final TextEditingController _player2NameController;
 
   /// The minimum points for winning the game.
-  late int winningPoints;
+  late int _winningPoints;
 
   /// The number of clear points.
-  late int clearPoints;
+  late int _clearPoints;
 
   /// The number of sets to play.
-  late int numberOfSets;
+  late int _numberOfSets;
 
   /// Whether or not players will switch ends every set.
-  late bool switchEnds;
+  late bool _switchEnds;
 
   /// The number of serves each player should have.
-  late int numberOfServes;
+  late int _numberOfServes;
 
   /// Initialise state.
   @override
@@ -64,11 +64,11 @@ class NewGameState extends State<NewGame> {
       baseOffset: 0,
       extentOffset: _player2NameController.text.length,
     );
-    winningPoints = 11;
-    clearPoints = 2;
-    numberOfSets = 1;
-    switchEnds = true;
-    numberOfServes = 2;
+    _winningPoints = 11;
+    _clearPoints = 2;
+    _numberOfSets = 1;
+    _switchEnds = true;
+    _numberOfServes = 2;
   }
 
   /// Dispose of the widget.
@@ -110,7 +110,7 @@ class NewGameState extends State<NewGame> {
                     _player2NameController.text = temp;
                   }),
             ),
-            PerformableActionsBuilder(
+            PerformableActionsListTile(
               actions: [
                 for (final setConfig in [
                   const _SetConfig(
@@ -132,32 +132,42 @@ class NewGameState extends State<NewGame> {
                         '${setConfig.numberOfSets} ${setConfig.numberOfSets == 1 ? "set" : "sets"}',
                     invoke:
                         () => setState(
-                          () => numberOfSets = setConfig.numberOfSets,
+                          () => _numberOfSets = setConfig.numberOfSets,
                         ),
                     activator: CrossPlatformSingleActivator(setConfig.key),
                   ),
               ],
-              builder:
-                  (final builderContext, final controller) => ListTile(
-                    title: const Text('Number of Sets'),
-                    subtitle: Text(numberOfSets.toString()),
-                    onTap: controller.toggle,
-                  ),
+              title: const Text('Number of Sets'),
+              subtitle: Text(_numberOfSets.toString()),
+              onLongPress: () => setState(() => _numberOfSets = 1),
             ),
-            if (numberOfSets > 1)
+            if (_numberOfSets > 1)
               CheckboxListTile(
-                value: switchEnds,
+                value: _switchEnds,
                 onChanged:
                     (_) => setState(() {
-                      switchEnds = !switchEnds;
+                      _switchEnds = !_switchEnds;
                     }),
                 title: const Text('Switch Ends Between Sets'),
               ),
             IntListTile(
-              value: numberOfServes,
+              value: _numberOfServes,
               onChanged:
-                  (final value) => setState(() => numberOfServes = value),
+                  (final value) => setState(() => _numberOfServes = value),
               title: 'Number of Serves',
+              min: 1,
+            ),
+            IntListTile(
+              value: _winningPoints,
+              onChanged:
+                  (final value) => setState(() => _winningPoints = value),
+              title: 'Winning Points',
+              min: 1,
+            ),
+            IntListTile(
+              value: _clearPoints,
+              onChanged: (final value) => setState(() => _clearPoints = value),
+              title: 'Clear Points',
               min: 1,
             ),
           ],
@@ -176,11 +186,11 @@ class NewGameState extends State<NewGame> {
     (_) => PlayGame(
       leftPlayerName: _player1NameController.text,
       rightPlayerName: _player2NameController.text,
-      winningPoints: winningPoints,
-      clearPoints: clearPoints,
-      switchEnds: switchEnds,
-      numberOfSets: numberOfSets,
-      numberOfServes: numberOfServes,
+      winningPoints: _winningPoints,
+      clearPoints: _clearPoints,
+      switchEnds: _switchEnds,
+      numberOfSets: _numberOfSets,
+      numberOfServes: _numberOfServes,
     ),
   );
 }
