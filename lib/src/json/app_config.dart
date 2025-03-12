@@ -9,7 +9,7 @@ part 'app_config.g.dart';
 @JsonSerializable()
 class AppConfig {
   /// Create an instance.
-  AppConfig({
+  const AppConfig({
     this.player1Name = 'Player 1',
     this.player2Name = 'Player 2',
     this.numberOfSets = 1,
@@ -28,25 +28,25 @@ class AppConfig {
   static const preferencesKey = 'showdown_app_config';
 
   /// The name of player 1.
-  String player1Name;
+  final String player1Name;
 
   /// The name of player 2.
-  String player2Name;
+  final String player2Name;
 
   /// The number of sets to play.
-  int numberOfSets;
+  final int numberOfSets;
 
   /// The number of serves for each player.
-  int numberOfServes;
+  final int numberOfServes;
 
   /// Whether to switch ends between sets.
-  bool switchEnds;
+  final bool switchEnds;
 
   /// The number of points to win.
-  int winningPoints;
+  final int winningPoints;
 
   /// The number of clear points.
-  int clearPoints;
+  final int clearPoints;
 
   /// Convert an instance to JSON.
   Map<String, dynamic> toJson() => _$AppConfigToJson(this);

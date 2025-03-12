@@ -13,7 +13,7 @@ Future<AppConfig> appConfig(final Ref ref) async {
   final preferences = SharedPreferencesAsync();
   final source = await preferences.getString(AppConfig.preferencesKey);
   if (source == null) {
-    return AppConfig();
+    return const AppConfig();
   }
   return AppConfig.fromJson(jsonDecode(source) as Map<String, dynamic>);
 }
